@@ -46,3 +46,5 @@ const errorHandler = (WrappedComponent, axios) => {
 
     }
 }
+
+export default errorHandler;
