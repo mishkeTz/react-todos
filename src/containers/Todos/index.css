@@ -1,0 +1,14 @@
+.ListGroupItem {
+    display: flex;
+}
+
+.ListGroupItem:hover {
+    cursor: pointer;
+}
+
+.ListGroupItem span:first-of-type {
+    flex: 1 1 auto;
+}
+
+.ListGroupItem span:last-of-type {
+}
