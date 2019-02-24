@@ -1,5 +1,16 @@
+.ListGroup {
+    padding: 10px;
+    background: #fff;
+}
+
 .ListGroupItem {
     display: flex;
+    border: none;
+    border-top: 1px solid lightgray;
+}
+
+.ListGroupItem:last-of-type {
+    border-bottom: 1px solid lightgray;
 }
 
 .ListGroupItem:hover {
@@ -11,4 +22,40 @@
 }
 
 .ListGroupItem span:last-of-type {
+}
+
+.Todo {
+    padding-top: 40px;
+}
+
+.ListGroupItem:first-child,
+.ListGroupItemSearch {
+    border-radius: 0;
+}
+
+.ListGroupItem:last-child {
+    border-radius: 0;
+}
+
+.ListGroupItemSearch {
+    padding: 0;
+    border: none;
+}
+
+.ListGroupItemSearch:focus {
+    outline: none;
+}
+
+.ListGroupItemSearch:hover,
+.ListGroupItem:hover {
+    z-index: inherit;
+}
+
+.ListGroupItemSearchInput,
+.ListGroupItemSearchIcon {
+    border-radius: 0;
+}
+
+.ListGroupItemSearchIcon:hover {
+    cursor: pointer;
 }

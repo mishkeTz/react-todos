@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 
 
 import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import ListGroup from 'react-bootstrap/ListGroup';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import classes from './index.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import axios from '../../axios-todo';
 
@@ -16,23 +16,38 @@ import errorHandler from '../../hoc/errorHandler';
 class Todos extends Component {
 
     state = {
-        todos: [
-            {
-                id: 1,
-                todo: 'Todo something 1',
-                completed: true,
-            },
-            {
-                id: 2,
-                todo: 'Todo something 2',
-                completed: false,
-            },
-            {
-                id: 3,
-                todo: 'Todo something 3',
-                completed: false,
-            },
-        ]
+        todos: [],
+        todo: '',
+        loading: true,
+    }
+
+    componentDidMount () {
+        axios
+            .get('https://todo-9b963.firebaseio.com/todos.json')
+            .then(res => {
+
+                const todos = [];
+                
+                if (res.data) {
+                    for (let x in res.data) {
+                        todos.push(res.data[x]);
+                    }
+                }
+                
+                this.setState({
+                    ...this.state,
+                    todos: todos,
+                    loading: false,
+                })
+
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({
+                    ...this.state,
+                    loading: false,
+                })
+            })
     }
 
     onClickHandler = (todoId) => {
@@ -51,36 +66,97 @@ class Todos extends Component {
         })
     }
 
+    onChangeTodoHandler = (e) => {
+        this.setState({
+            ...this.state,
+            todo: e.target.value
+        })
+    }
+
+    addTodoHandler = () => {
+        const todo = this.state.todo;
+
+        console.log('TODO:', todo);
+
+        if (!todo || todo.trim() == '') {
+            // warning
+            return false;
+        }
+
+        const todos = this.state.todos.map(todo => {
+            return {
+                ...todo
+            };
+        });
+
+        const lastTodo = todos[todos.length - 1];
+        const todoId = lastTodo ? lastTodo.id + 1 : 1;
+
+        const newTodo = {
+            id: todoId,
+            todo: todo,
+            completed: false
+        };
+
+        axios
+            .post('https://todo-9b963.firebaseio.com/todos.json', newTodo)
+            .then(res => {
+                todos.push(newTodo);
+
+                this.setState({
+                    ...this.state,
+                    todos: todos,
+                    todo: '',
+                })
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    }
+
   render() {
 
     console.log(this.state.todos);
 
+    let todos = <p>Loading...</p>;
 
-    const todos = this.state.todos.map(todo => {
-        return <ListGroup.Item 
-                    className={classes.ListGroupItem}
-                    key={todo.id}>
-                        <span>{todo.todo}</span>
-                        <span onClick={() => this.onClickHandler(todo.id)}>x</span>
-                </ListGroup.Item>
-    })
+    if (!this.state.loading) {
+
+        if (this.state.todos.length > 0) {
+            todos = this.state.todos.map(todo => {
+                return <ListGroup.Item 
+                            className={classes.ListGroupItem}
+                            key={todo.id}>
+                                <span>{todo.todo}</span>
+                                <span onClick={() => this.onClickHandler(todo.id)}>x</span>
+                        </ListGroup.Item>
+            })
+        } else {
+            todos = <p>There are currently no added todos.</p>;
+        }
+    }
+
+    
 
     return (
-      <div>
+      <div className={classes.Todo}>
             <Row className="justify-content-md-center">
                 <Col xs={12} md={6}>
-                    <ListGroup>
+                    <ListGroup className={classes.ListGroup}>
                         <ListGroup.Item className={classes.ListGroupItemSearch}>
                             <InputGroup className="mb-3">
                                 <FormControl
-                                    placeholder="Username"
-                                    aria-label="Username"
+                                    placeholder="Todo"
+                                    aria-label="Todo"
                                     aria-describedby="basic-addon1"
+                                    onChange={this.onChangeTodoHandler}
+                                    value={this.state.todo}
+                                    className={classes.ListGroupItemSearchInput}
                                 />
                                 <InputGroup.Append>
-                                    <InputGroup.Text id="basic-addon1">+</InputGroup.Text>
+                                    <InputGroup.Text onClick={this.addTodoHandler} id="basic-addon1" className={classes.ListGroupItemSearchIcon}><FontAwesomeIcon icon="plus" /></InputGroup.Text>
                                 </InputGroup.Append>
-                            </InputGroup>
+                            </InputGroup> 
                         </ListGroup.Item>
                         {todos}
                     </ListGroup>
