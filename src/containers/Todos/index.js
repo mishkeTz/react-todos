@@ -30,7 +30,10 @@ class Todos extends Component {
                 
                 if (res.data) {
                     for (let x in res.data) {
-                        todos.push(res.data[x]);
+                        todos.push({
+                            ...res.data[x],
+                            key: x
+                        });
                     }
                 }
                 
@@ -50,20 +53,28 @@ class Todos extends Component {
             })
     }
 
-    onClickHandler = (todoId) => {
-        const todos = this.state.todos.filter(todo => {
-            if (todo.id !== todoId) {
-                return {
-                    ...todo
-                };
-            }
+    removeTodoHandler = (todoKey) => {
 
-            return false;
-        });
-
-        this.setState({
-            todos: todos
-        })
+        axios
+            .delete('https://todo-9b963.firebaseio.com/todos/' + todoKey + '.json')
+            .then(res => {
+                const todos = this.state.todos.filter(todo => {
+                    if (todo.key !== todoKey) {
+                        return {
+                            ...todo
+                        };
+                    }
+        
+                    return false;
+                });
+        
+                this.setState({
+                    todos: todos
+                })
+            })
+            .catch(err => {
+                console.log(err);
+            })
     }
 
     onChangeTodoHandler = (e) => {
@@ -100,8 +111,11 @@ class Todos extends Component {
 
         axios
             .post('https://todo-9b963.firebaseio.com/todos.json', newTodo)
-            .then(res => {
-                todos.push(newTodo);
+            .then(res =>  {
+                todos.push({
+                    ...newTodo,
+                    key: res.data.name,
+                });
 
                 this.setState({
                     ...this.state,
@@ -128,15 +142,13 @@ class Todos extends Component {
                             className={classes.ListGroupItem}
                             key={todo.id}>
                                 <span>{todo.todo}</span>
-                                <span onClick={() => this.onClickHandler(todo.id)}>x</span>
+                                <span onClick={() => this.removeTodoHandler(todo.key)}>x</span>
                         </ListGroup.Item>
             })
         } else {
             todos = <p>There are currently no added todos.</p>;
         }
     }
-
-    
 
     return (
       <div className={classes.Todo}>
