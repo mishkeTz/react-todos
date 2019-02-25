@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 
-
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -8,6 +7,8 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import classes from './index.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import SearchTodo from './SearchTodo';
 
 import axios from '../../axios-todo';
 
@@ -78,6 +79,9 @@ class Todos extends Component {
     }
 
     onChangeTodoHandler = (e) => {
+
+        console.log("E", e);
+
         this.setState({
             ...this.state,
             todo: e.target.value
@@ -86,7 +90,6 @@ class Todos extends Component {
 
     addTodoHandler = () => {
         const todo = this.state.todo;
-
         console.log('TODO:', todo);
 
         if (!todo || todo.trim() == '') {
@@ -157,14 +160,9 @@ class Todos extends Component {
                     <ListGroup className={classes.ListGroup}>
                         <ListGroup.Item className={classes.ListGroupItemSearch}>
                             <InputGroup className="mb-3">
-                                <FormControl
-                                    placeholder="Todo"
-                                    aria-label="Todo"
-                                    aria-describedby="basic-addon1"
-                                    onChange={this.onChangeTodoHandler}
-                                    value={this.state.todo}
-                                    className={classes.ListGroupItemSearchInput}
-                                />
+                                <SearchTodo 
+                                    onChangeTodoHandler={this.onChangeTodoHandler}
+                                    todo={this.state.todo}/>
                                 <InputGroup.Append>
                                     <InputGroup.Text onClick={this.addTodoHandler} id="basic-addon1" className={classes.ListGroupItemSearchIcon}><FontAwesomeIcon icon="plus" /></InputGroup.Text>
                                 </InputGroup.Append>
